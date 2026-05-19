@@ -34,10 +34,14 @@ public class Categoria {
         this.nome = nome;
     }
 
+    public List<Produto> getProdutos() {
+        return produtos;
+    }
+
     @Override
     public String toString() {
-        return "categoriaId : " + categoriaId +
-                ", nome : " + nome;
+        return "Id: " + categoriaId + "\n" +
+                "nome : " + nome;
     }
 
     @OneToMany(mappedBy = "categoria")

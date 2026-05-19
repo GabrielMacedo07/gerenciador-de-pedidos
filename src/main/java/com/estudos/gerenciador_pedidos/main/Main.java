@@ -6,7 +6,7 @@ import com.estudos.gerenciador_pedidos.repository.CategoriaRepository;
 import com.estudos.gerenciador_pedidos.repository.PedidoRepository;
 import com.estudos.gerenciador_pedidos.repository.ProdutoRepository;
 import org.springframework.stereotype.Component;
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -30,9 +30,10 @@ public class Main {
         while (opcao !=4){
             String menu = """
                     1 - Adicionar produto
-                    2 - Ver lista por categoria
-                    3 - remover algum produto
-                    4 - sair
+                    2 - Adicionar categoria
+                    3 - Ver lista por categoria
+                    4 - Remover algum produto
+                    5 - Sair
                     """;
             System.out.println(menu);
             opcao = sc.nextInt();
@@ -42,12 +43,15 @@ public class Main {
                     adicionaProduto();
                     break;
                 case 2:
-                    listarPorCategoria();
+                    adicionaCategoria();
                     break;
                 case 3:
-                    removerProduto();
+                    listarCategoriaComProdutos();
                     break;
                 case 4:
+                    removerProduto();
+                    break;
+                case 5:
                     System.out.println("Saindo...");
                     break;
                 default:
@@ -65,8 +69,42 @@ public class Main {
         System.out.println("Quantidade: ");
         int quantidade = sc.nextInt();
         sc.nextLine();
-        System.out.println("Adicione a uma categoria usando o id: ");
-        listaDeCategoria();
+        System.out.println("Você precisa adicionar o produto em uma categoria usando o id: ");
+        verCategoria();
+        adicionaProdutoEmCategoria(nome, preco, quantidade);
+
+    }
+    private void adicionaCategoria(){
+        System.out.println("Nomeie a categoria nova: ");
+        String nome = sc.nextLine().toUpperCase();
+        Categoria categoria = new Categoria(nome);
+        categoriaRepository.save(categoria);
+        System.out.println("Adicionada com Sucesso");
+    }
+
+    private void listarCategoriaComProdutos() {
+        List<Categoria> categorias = categoriaRepository.buscarCategoriasComProdutos();
+
+        for (Categoria categoria: categorias){
+            System.out.println(categoria.getNome() + " \n");
+            for(Produto produto: categoria.getProdutos()){
+                System.out.println(
+                        produto.getProdutoId() + " "+
+                                produto.getNome() + " - Quantidade: " +
+                                produto.getQuantidade() + " - Preço: " +
+                                produto.getPreco()
+                );
+            }
+            System.out.println();
+        }
+    }
+
+    private void verCategoria(){
+        categoriaRepository.findAll().forEach(System.out::println);
+    }
+
+    private void adicionaProdutoEmCategoria(String nome, double preco, int quantidade){
+        System.out.println("Adicione: ");
         Long categoriaId = sc.nextLong();
         sc.nextLine();
         Optional<Categoria> categoriaOptional = categoriaRepository.findById(categoriaId);
@@ -76,20 +114,7 @@ public class Main {
             produto.setCategoria(categoria);
             produtoRepository.save(produto);
             System.out.println("Produto adicionado com sucesso");
-
         }
-
-    }
-    private void listarPorCategoria() {
-//        List<Produto> produtoList = produtoRepository.findAll();
-//        produtoList.stream()
-//                .sorted(Comparator.comparing(Produto::getNome))
-//                .forEach(System.out::println);
-        categoriaRepository.findAll().forEach(System.out::println);
-    }
-
-    private void listaDeCategoria(){
-        categoriaRepository.findAll().forEach(System.out::println);
     }
     private void removerProduto() {
 
