@@ -27,7 +27,7 @@ public class Main {
 
     public void exibirMenu(){
         var opcao = -1;
-        while (opcao !=4){
+        while (opcao !=5){
             String menu = """
                     1 - Adicionar produto
                     2 - Adicionar categoria
@@ -117,8 +117,24 @@ public class Main {
         }
     }
     private void removerProduto() {
+        System.out.println("Qual produto você quer remover?");
+        listarCategoriaComProdutos();
+        System.out.println("Remova usando o id: ");
+        Long id = sc.nextLong();
+        sc.nextLine();
+        if (!produtoRepository.existsById(id)) {
+            throw new RuntimeException("Produto não encontrado com o ID: " + id);
+        }
+        System.out.println("Tem certeza? (S/N)");
+        char resposta = sc.next().charAt(0);
+        if(resposta == 'S' || resposta == 's'){
+            Optional<Produto> produto = produtoRepository.findById(id);
+            produto.ifPresent(value -> System.out.println("Removendo " + value.getNome()+"..."));
+            produtoRepository.deleteById(id);
+            System.out.println("Produto removido com sucesso!");
+        }else {
+            System.out.println("Produto não foi removido!");
+        }
 
     }
-
-
 }
